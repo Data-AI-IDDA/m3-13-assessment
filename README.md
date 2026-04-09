@@ -1,30 +1,27 @@
 ![logo_ironhack_blue 7](https://user-images.githubusercontent.com/23629340/40541063-a07a0a8a-601a-11e8-91b5-2f13e4e6b441.png)
 
-# Assessment | Statistical Evaluation and Communication
+# Assessment | Statistical Evaluation Mini-Project
 
 ## Overview
 
-This final assessment brings together everything you have learned across the Statistics for Data Science module. You will perform an end-to-end analysis that spans correlation analysis, group comparisons, statistical visualization, and machine-learning metric evaluation with uncertainty quantification.
+This assessment brings together the core skills from the Statistics for Data Science module. You will explore a real dataset through correlation analysis and group comparisons, then train a simple classifier and quantify the uncertainty around its performance using bootstrap confidence intervals.
 
-Real-world data projects rarely involve a single technique. Decision-makers need analysts who can choose the right method for each question, execute it correctly, and weave the results into a coherent narrative. This assessment mirrors that workflow: you will move from exploration to inference to evaluation, just as you would in a professional setting.
-
-The assessment culminates in an evaluation memo that synthesizes your findings into a recommendation. This is where analytical skill meets communication skill — the combination that makes data professionals effective.
+You will work with the **Auto MPG** dataset, which contains fuel-efficiency data for cars from the 1970s–80s along with technical specifications and region of origin. The dataset is available directly from seaborn, so there is nothing to download.
 
 ## Learning Goals
 
-- Compute and interpret Pearson and Spearman correlations with appropriate significance tests
+- Compute and interpret Pearson and Spearman correlations with significance tests
 - Perform one-way ANOVA and post-hoc comparisons to evaluate group differences
-- Create publication-quality statistical visualizations that support your narrative
-- Use bootstrap resampling to construct confidence intervals for ML evaluation metrics
-- Synthesize multiple analyses into a coherent evaluation memo with actionable recommendations
+- Use bootstrap resampling to construct confidence intervals for classification metrics
+- Communicate statistical findings clearly through visualizations and written interpretation
 
 ## Prerequisites
 
 - Python 3.9+
-- Libraries: pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn
+- Libraries: pandas, numpy, scipy, scikit-learn, matplotlib, seaborn
 
 ```bash
-pip install pandas numpy scipy statsmodels scikit-learn matplotlib seaborn
+pip install pandas numpy scipy scikit-learn matplotlib seaborn
 ```
 
 ## Requirements
@@ -32,62 +29,82 @@ pip install pandas numpy scipy statsmodels scikit-learn matplotlib seaborn
 1. **Fork** the assessment repository to your GitHub account.
 2. **Clone** your fork locally.
 3. Work inside the Jupyter notebook named **`m3-13-assessment.ipynb`**.
-4. Commit and push your work regularly.
+4. Use `random_state=42` wherever randomness is involved.
+5. Commit and push your work regularly.
+
+## Loading the Dataset
+
+```python
+import seaborn as sns
+
+mpg = sns.load_dataset("mpg")
+mpg = mpg.dropna()
+```
+
+The dataset includes the following columns:
+
+| Column | Type | Description |
+|---|---|---|
+| mpg | float | Miles per gallon (fuel efficiency) |
+| cylinders | int | Number of cylinders |
+| displacement | float | Engine displacement (cubic inches) |
+| horsepower | float | Engine horsepower |
+| weight | float | Vehicle weight (lbs) |
+| acceleration | float | 0–60 mph time (seconds) |
+| model_year | int | Model year (70–82) |
+| origin | str | Region of manufacture: usa, europe, japan |
+| name | str | Car name |
 
 ## Tasks
 
 ### Task 1 — Correlation Analysis
 
-1. Select at least three pairs of numeric variables and compute both Pearson and Spearman correlation coefficients.
-2. Test each correlation for statistical significance and report p-values.
-3. Create a correlation heatmap and at least two scatter plots with regression lines.
-4. Discuss when Pearson vs. Spearman is more appropriate given the data's characteristics.
+Explore the relationships between numeric variables in the dataset.
 
-### Task 2 — Group Comparisons with ANOVA
+1. Choose at least three pairs of numeric variables (e.g., mpg vs. weight, displacement vs. horsepower) and compute both Pearson and Spearman correlation coefficients.
+2. Test each correlation for significance and report the p-values.
+3. Create a correlation heatmap and at least two scatter plots with regression lines. Annotate each plot with the correlation coefficient.
+4. In a Markdown cell, briefly explain when Pearson vs. Spearman is more appropriate, using examples from your results.
 
-1. Identify a categorical variable with three or more groups and a continuous outcome variable.
-2. Check ANOVA assumptions (normality within groups, homogeneity of variance).
-3. Perform a one-way ANOVA and report the F-statistic, p-value, and effect size (eta-squared).
-4. If the ANOVA is significant, run Tukey's HSD post-hoc test and interpret pairwise differences.
-5. If assumptions are violated, apply the Kruskal-Wallis alternative and compare results.
+### Task 2 — Group Comparisons
 
-### Task 3 — Statistical Visualization
+Compare a numeric variable across the three origin groups (usa, europe, japan).
 
-1. Create at least four publication-quality visualizations that support your analysis from Tasks 1–2.
-2. Each visualization must include: a descriptive title, labeled axes, a legend (if applicable), and annotation of key statistical results (e.g., r-value on scatter plots, significance brackets on group comparisons).
-3. Use color, layout, and design choices intentionally to guide the reader's attention.
-4. Write a one-paragraph caption for each visualization explaining its message.
+1. Choose a numeric variable (e.g., mpg) and visualize its distribution per origin group using box plots or violin plots.
+2. Check ANOVA assumptions: normality within each group (Shapiro-Wilk) and homogeneity of variance (Levene's test).
+3. Perform a one-way ANOVA and report the F-statistic, p-value, and eta-squared effect size.
+4. If the ANOVA is significant, run Tukey's HSD post-hoc test and state which groups differ.
 
-### Task 4 — Bootstrap Confidence Intervals for ML Metrics
+### Task 3 — Classification with Bootstrap Confidence Intervals
 
-1. Using a provided set of model predictions and true labels, compute accuracy, precision, recall, and F1-score.
-2. Implement bootstrap resampling (at least 2 000 iterations) to construct 95% confidence intervals for each metric.
-3. Visualize the bootstrap distributions and confidence intervals (e.g., histogram with shaded CI region).
-4. Interpret the intervals: How certain can you be about the model's performance? Are any metrics unreliable given the sample size?
+Train a classifier to predict **origin** from the numeric features, then quantify how certain you can be about its performance.
 
-### Task 5 — Evaluation Memo
+1. Prepare the data: use the numeric columns as features and `origin` as the target. Split into train (75 %) and test (25 %) sets with stratification.
+2. Train at least two classifiers (e.g., Logistic Regression and Decision Tree) with default hyperparameters.
+3. Print a classification report for each model.
+4. Write a function `bootstrap_metric(y_true, y_pred, metric_fn, n_boot=2000, seed=42)` and use it to compute 95 % bootstrap confidence intervals for F1, precision, and recall for each model.
+5. Visualize the CIs (e.g., dot-and-whisker plot) and state which model you would recommend and why.
 
-1. Write an evaluation memo (500–700 words) that synthesizes findings from Tasks 1–4.
-2. Structure: Context → Key Findings → Limitations → Recommendations.
-3. Address a hypothetical stakeholder who needs to decide whether to deploy or iterate on the model.
-4. Reference specific statistical evidence (correlations, group differences, metric CIs) to support your recommendation.
-5. Use clear, professional language accessible to a mixed technical/non-technical audience.
+### Task 4 — Summary
+
+Write a short summary (150–250 words) in a final Markdown cell that answers:
+
+1. What were the strongest correlations you found, and what do they tell you about fuel efficiency?
+2. Do cars from different origins differ significantly in the variable you tested? Which groups stand out?
+3. Which classifier would you recommend, and how confident are you in its performance based on the bootstrap CIs?
 
 ## Submission
 
 ### What to submit
 
-- A completed Jupyter notebook (`m3-13-assessment.ipynb`) with all code, outputs, and markdown explanations.
-- The evaluation memo can be included as a final markdown section in the notebook.
+- A completed Jupyter notebook (`m3-13-assessment.ipynb`) with all code, outputs, and Markdown explanations.
 
 ### Definition of done
 
-- [ ] Correlation analysis includes Pearson, Spearman, significance tests, and visualizations
-- [ ] ANOVA is performed with assumption checks, effect size, and post-hoc tests
-- [ ] At least four publication-quality visualizations with captions are included
-- [ ] Bootstrap CIs are computed for four ML metrics with distribution plots
-- [ ] Evaluation memo is 500–700 words with clear structure and evidence-based recommendations
-- [ ] All statistical results are interpreted in plain language alongside technical values
+- [ ] Correlation analysis with Pearson/Spearman, p-values, heatmap, and scatter plots (Task 1)
+- [ ] ANOVA with assumption checks, effect size, and post-hoc test (Task 2)
+- [ ] Two classifiers trained with bootstrap 95 % CIs for F1, precision, and recall (Task 3)
+- [ ] Written summary connecting findings across all tasks (Task 4)
 - [ ] Notebook runs top-to-bottom without errors
 
 ### How to submit
@@ -108,9 +125,8 @@ pip install pandas numpy scipy statsmodels scikit-learn matplotlib seaborn
 
 | Criterion | Weight | Description |
 |---|---|---|
-| Correlation Analysis | 15% | Correct computation, appropriate method choice, and clear interpretation |
-| ANOVA & Group Comparisons | 20% | Proper assumption checks, correct execution, and meaningful post-hoc analysis |
-| Statistical Visualization | 20% | Publication-quality charts with annotations, captions, and intentional design |
-| Bootstrap ML Metrics | 20% | Correct implementation, clear visualization, and thoughtful interpretation |
-| Evaluation Memo | 20% | Well-structured, evidence-based, and accessible to mixed audiences |
-| Code Quality | 5% | Clean, well-organized notebook that runs without errors |
+| Correlation Analysis | 25 % | Correct computation, appropriate method choice, annotated visualizations |
+| Group Comparisons | 25 % | Proper assumption checks, correct ANOVA execution, post-hoc interpretation |
+| Bootstrap ML Metrics | 30 % | Correct bootstrap implementation, CI visualization, model recommendation |
+| Summary & Communication | 15 % | Clear, evidence-based summary connecting all tasks |
+| Code Quality | 5 % | Clean, organized notebook that runs without errors |
